@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>API Demo | Spring Boot</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/api-demo.css">
+    <script src="/api-demo.js" defer></script>
+    <style>
+        /* Toast notification styling */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--container-bg);
+            color: var(--primary-text);
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            z-index: 1000;
+            max-width: 300px;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-left-color: var(--error-color);
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+
+        .toast.success i {
+            color: var(--success-color);
+        }
+
+        .toast.error i {
+            color: var(--error-color);
+        }
+
+        /* Tooltip styling */
+        .tooltip {
+            position: absolute;
+            background: var(--container-bg);
+            color: var(--primary-text);
+            padding: 8px 12px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            font-size: 0.85rem;
+            z-index: 100;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-row">
+        <h1>API Demo: Java &amp; Kotlin</h1>
+        <div class="theme-toggle">
+            <label>
+                <input type="checkbox" id="theme-switch" onchange="toggleTheme()">
+                <span></span>
+                Dark Mode
+            </label>
+        </div>
+    </div>
+    <div class="api-sections-row">
+        <div class="api-section">
+            <h2><i class="bi bi-code-slash"></i> Kotlin Controller</h2>
+
+            <div>
+                <span class="api-badge">GET</span>
+                <button onclick="callApi('/api/HelloKotlin/hello', 'kotlin-hello-result')">
+                    <i class="bi bi-play-fill"></i> /api/HelloKotlin/hello
+                </button>
+            </div>
+            <div class="result" id="kotlin-hello-result"></div>
+
+            <div class="mt-4">
+                <span class="api-badge">GET</span>
+                <label for="kotlin-greeting-result-input">Name Parameter</label>
+                <input id="kotlin-greeting-result-input" placeholder="Enter your name" />
+                <button onclick="callApi('/api/HelloKotlin/greeting', 'kotlin-greeting-result')">
+                    <i class="bi bi-play-fill"></i> /api/HelloKotlin/greeting
+                </button>
+            </div>
+            <div class="result" id="kotlin-greeting-result"></div>
+        </div>
+
+        <div class="api-section">
+            <h2><i class="bi bi-cup-hot"></i> Java Controller</h2>
+
+            <div>
+                <span class="api-badge">GET</span>
+                <button onclick="callApi('/api/HelloJava/hello', 'java-hello-result')">
+                    <i class="bi bi-play-fill"></i> /api/HelloJava/hello
+                </button>
+            </div>
+            <div class="result" id="java-hello-result"></div>
+
+            <div class="mt-4">
+                <span class="api-badge">GET</span>
+                <label for="java-greet-result-input">Name Parameter</label>
+                <input id="java-greet-result-input" placeholder="Enter your name" />
+                <button onclick="callApi('/api/HelloJava/greet', 'java-greet-result')">
+                    <i class="bi bi-play-fill"></i> /api/HelloJava/greet
+                </button>
+            </div>
+            <div class="result" id="java-greet-result"></div>
+        </div>
+    </div>
+
+    <!-- Exercises Section -->
+    <div class="header-row" style="margin-top: 40px;">
+        <h1>Building Java Programs</h1>
+    </div>
+
+    <div class="api-sections-row">
+        <div class="api-section">
+            <h2><i class="bi bi-1-circle"></i> Exercise 1</h2>
+            <div>
+                <span class="api-badge">GET</span>
+                <button onclick="callApi('/api/HelloJava/exercise1', 'exercise1-result')" data-tooltip="Display victory message">
+                    <i class="bi bi-play-fill"></i> /api/HelloJava/exercise1
+                </button>
+            </div>
+            <div class="result" id="exercise1-result"></div>
+        </div>
+
+        <div class="api-section">
+            <h2><i class="bi bi-2-circle"></i> Exercise 2</h2>
+            <div>
+                <span class="api-badge">GET</span>
+                <label for="exercise2-result-depth">Output Depth</label>
+                <input type="number" id="exercise2-result-depth" value="5" min="1" max="50" placeholder="Depth (1-50)" />
+                <button onclick="callApi('/api/HelloJava/exercise2', 'exercise2-result')" data-tooltip="Generate pattern with specified depth">
+                    <i class="bi bi-play-fill"></i> /api/HelloJava/exercise2
+                </button>
+            </div>
+            <div class="result" id="exercise2-result"></div>
+        </div>
+    </div>
+
+    <div class="credit">
+        <p>Made with <i class="bi bi-heart-fill" style="color: #e25555;"></i> using Spring Boot, Java, Kotlin &amp; Thymeleaf</p>
+        <p>© 2025 Christian Oleson</p>
+    </div>
+</div>
+</body>
+</html>
