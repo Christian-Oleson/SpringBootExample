@@ -68,6 +68,98 @@
             z-index: 100;
             pointer-events: none;
         }
+
+        /* Custom select styling */
+        .custom-select {
+            appearance: none;
+            background: var(--container-bg);
+            color: var(--primary-text);
+            padding: 10px 40px 10px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .custom-select option {
+            background: var(--container-bg);
+            color: var(--primary-text);
+        }
+
+        .selector-row {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            margin-bottom: 32px;
+        }
+
+        .selector-container {
+            flex: 1;
+        }
+
+        .accent-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .accent-btn:hover {
+            background: var(--accent-color-hover);
+        }
+
+        .params-container {
+            margin-top: 16px;
+            margin-bottom: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .param-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .param-group label {
+            flex: 0 0 120px;
+            font-weight: 500;
+        }
+
+        .param-group input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--container-bg);
+            color: var(--primary-text);
+            font-size: 1rem;
+        }
+
+        .param-group input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .info-text {
+            color: var(--secondary-text);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -133,29 +225,51 @@
         <h1>Building Java Programs</h1>
     </div>
 
-    <div class="api-sections-row">
-        <div class="api-section">
-            <h2><i class="bi bi-1-circle"></i> Exercise 1</h2>
-            <div>
-                <span class="api-badge">GET</span>
-                <button onclick="callApi('/api/HelloJava/exercise1', 'exercise1-result')" data-tooltip="Display victory message">
-                    <i class="bi bi-play-fill"></i> /api/HelloJava/exercise1
+    <p class="info-text">Select a chapter and exercise number to run specific examples. Parameters will appear automatically based on the selected exercise.</p>
+
+    <!-- Add chapter and exercise selector -->
+    <div class="api-section">
+        <div class="selector-row">
+            <div class="selector-container">
+                <label for="chapter-select">Select Chapter:</label>
+                <select id="chapter-select" class="custom-select" onchange="updateExerciseParams()">
+                    <option value="1">Chapter 1</option>
+                    <option value="2">Chapter 2</option>
+                    <option value="3">Chapter 3</option>
+                    <option value="4">Chapter 4</option>
+                    <option value="5">Chapter 5</option>
+                </select>
+            </div>
+            <div class="selector-container">
+                <label for="exercise-select">Select Exercise:</label>
+                <select id="exercise-select" class="custom-select" onchange="updateExerciseParams()">
+                    <option value="1">Exercise 1</option>
+                    <option value="2">Exercise 2</option>
+                    <option value="3">Exercise 3</option>
+                    <option value="4">Exercise 4</option>
+                    <option value="5">Exercise 5</option>
+                </select>
+            </div>
+            <div class="selector-container">
+                <label>&nbsp;</label>
+                <button id="dynamic-exercise-btn" class="accent-btn" onclick="callDynamicExercise()">
+                    <i class="bi bi-play-fill"></i> Run Selected Exercise
                 </button>
             </div>
-            <div class="result" id="exercise1-result"></div>
         </div>
 
-        <div class="api-section">
-            <h2><i class="bi bi-2-circle"></i> Exercise 2</h2>
-            <div>
-                <span class="api-badge">GET</span>
-                <label for="exercise2-result-depth">Output Depth</label>
-                <input type="number" id="exercise2-result-depth" value="5" min="1" max="50" placeholder="Depth (1-50)" />
-                <button onclick="callApi('/api/HelloJava/exercise2', 'exercise2-result')" data-tooltip="Generate pattern with specified depth">
-                    <i class="bi bi-play-fill"></i> /api/HelloJava/exercise2
-                </button>
-            </div>
-            <div class="result" id="exercise2-result"></div>
+        <!-- Dynamic parameter inputs will appear here -->
+        <div id="dynamic-params-container" class="params-container"></div>
+
+        <div class="result" id="dynamic-exercise-result"></div>
+
+        <div class="info-text mt-4">
+            <p><strong>Available Exercises:</strong></p>
+            <ul>
+                <li><strong>Exercise 1:</strong> Display victory message</li>
+                <li><strong>Exercise 2:</strong> Generate pattern with specified depth</li>
+                <li><strong>Exercise 3:</strong> Read specified file from the filesystem</li>
+            </ul>
         </div>
     </div>
 

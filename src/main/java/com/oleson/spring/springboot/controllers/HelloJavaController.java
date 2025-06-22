@@ -35,4 +35,9 @@ public class HelloJavaController {
     public String exercise2(int outputDepth) {
         return Chapter1.exercise2(outputDepth);
     }
+
+    @GetMapping("/exercise3")
+    public String exercise3(String fileName) throws Exception {
+        return Chapter1.readKotlinFile(fileName);
+    }
 }

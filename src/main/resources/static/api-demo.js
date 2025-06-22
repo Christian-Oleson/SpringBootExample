@@ -14,46 +14,169 @@ function toggleTheme() {
     setTheme(isDark);
 }
 
-// API call handling
-async function callApi(url, resultId) {
-    const resultElement = document.getElementById(resultId);
-    const nameInput = document.getElementById(resultId + '-input');
-    let urlWithParam = url;
+// Exercise parameter configuration
+const exerciseParams = {
+    // Chapter 1 exercise parameters
+    '1': {
+        '1': [], // No parameters
+        '2': [{ name: 'outputDepth', label: 'Output Depth', type: 'number', default: '5', placeholder: 'Pattern depth (1-50)' }],
+        '3': [{ name: 'fileName', label: 'File Name', type: 'text', default: '', placeholder: 'Enter file name' }],
+        '4': [], // No parameters for exercise 4 yet
+        '5': []  // No parameters for exercise 5 yet
+    },
+    // Add parameter definitions for other chapters as needed
+    '2': {
+        '1': [], '2': [], '3': [], '4': [], '5': []
+    },
+    '3': {
+        '1': [], '2': [], '3': [], '4': [], '5': []
+    },
+    '4': {
+        '1': [], '2': [], '3': [], '4': [], '5': []
+    },
+    '5': {
+        '1': [], '2': [], '3': [], '4': [], '5': []
+    }
+};
 
-    if (nameInput && nameInput.value) {
-        urlWithParam += '?name=' + encodeURIComponent(nameInput.value);
+// Updates the parameter input fields based on the selected chapter and exercise
+function updateExerciseParams() {
+    const chapter = document.getElementById('chapter-select').value;
+    const exercise = document.getElementById('exercise-select').value;
+    const paramsContainer = document.getElementById('dynamic-params-container');
+
+    // Clear existing parameter inputs
+    paramsContainer.innerHTML = '';
+
+    // Get parameters for the selected chapter and exercise
+    const params = exerciseParams[chapter][exercise] || [];
+
+    // Create input fields for each parameter
+    params.forEach(param => {
+        const paramGroup = document.createElement('div');
+        paramGroup.className = 'param-group';
+
+        const label = document.createElement('label');
+        label.htmlFor = `dynamic-param-${param.name}`;
+        label.textContent = param.label;
+
+        const input = document.createElement('input');
+        input.type = param.type;
+        input.id = `dynamic-param-${param.name}`;
+        input.name = param.name;
+        input.placeholder = param.placeholder;
+        input.value = param.default || '';
+
+        if (param.type === 'number') {
+            input.min = param.min || '1';
+            input.max = param.max || '50';
+        }
+
+        paramGroup.appendChild(label);
+        paramGroup.appendChild(input);
+        paramsContainer.appendChild(paramGroup);
+    });
+}
+
+// Dynamic exercise handling
+function callDynamicExercise() {
+    const chapter = document.getElementById('chapter-select').value;
+    const exercise = document.getElementById('exercise-select').value;
+    const resultId = 'dynamic-exercise-result';
+
+    // Base URL for the API call
+    let url = '';
+
+    // Special case handling for Chapter 1 exercises which have a different URL pattern
+    if (chapter === '1') {
+        url = `/api/HelloJava/exercise${exercise}`;
+    } else {
+        url = `/api/HelloJava/chapter${chapter}/exercise${exercise}`;
     }
 
-    // For exercise2, check for outputDepth input
-    if (url.includes('exercise2')) {
-        const depthInput = document.getElementById(resultId + '-depth');
-        if (depthInput && depthInput.value) {
-            urlWithParam += '?outputDepth=' + encodeURIComponent(depthInput.value);
-        } else {
-            urlWithParam += '?outputDepth=5'; // Default value
+    // Get parameters for the selected exercise
+    const params = exerciseParams[chapter][exercise] || [];
+
+    // Collect parameter values from input fields
+    const paramValues = {};
+    params.forEach(param => {
+        const inputElement = document.getElementById(`dynamic-param-${param.name}`);
+        if (inputElement && inputElement.value) {
+            paramValues[param.name] = inputElement.value;
         }
+    });
+
+    // Call the API with collected parameters
+    callApiWithParams(url, resultId, paramValues);
+}
+
+// API call handling with parameters
+function callApiWithParams(url, resultId, paramValues = {}) {
+    const resultElement = document.getElementById(resultId);
+    let urlWithParams = url;
+
+    // Add parameters to URL
+    if (Object.keys(paramValues).length > 0) {
+        const queryParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(paramValues)) {
+            queryParams.append(key, value);
+        }
+        urlWithParams += '?' + queryParams.toString();
     }
 
     // Show loading indicator
     resultElement.classList.add('loading');
     resultElement.textContent = '';
 
-    try {
-        const response = await fetch(urlWithParam);
-        resultElement.classList.remove('loading');
-        resultElement.textContent = await response.text();
+    // Call the API
+    fetch(urlWithParams)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.text();
+        })
+        .then(data => {
+            resultElement.classList.remove('loading');
+            resultElement.textContent = data;
 
-        // Add and remove the updated class to trigger animation
-        resultElement.classList.add('updated');
-        setTimeout(() => resultElement.classList.remove('updated'), 500);
+            // Add and remove the updated class to trigger animation
+            resultElement.classList.add('updated');
+            setTimeout(() => resultElement.classList.remove('updated'), 500);
 
-        // Show toast notification
-        showToast('API call successful!', 'success');
-    } catch (error) {
-        resultElement.classList.remove('loading');
-        resultElement.textContent = `Error: ${error.message}`;
-        showToast('API call failed!', 'error');
+            // Show toast notification
+            showToast('API call successful!', 'success');
+        })
+        .catch(error => {
+            resultElement.classList.remove('loading');
+            resultElement.textContent = `Error: ${error.message}`;
+            showToast('API call failed!', 'error');
+        });
+}
+
+// Original API call handling for backward compatibility
+function callApi(url, resultId) {
+    const resultElement = document.getElementById(resultId);
+    const nameInput = document.getElementById(resultId + '-input');
+    const paramValues = {};
+
+    // Check if this is a name parameter request
+    if (nameInput && nameInput.value) {
+        paramValues.name = nameInput.value;
     }
+
+    // For exercise2, check for outputDepth input
+    if (url.includes('exercise2')) {
+        const depthInput = document.getElementById(resultId + '-depth');
+        if (depthInput && depthInput.value) {
+            paramValues.outputDepth = depthInput.value;
+        } else {
+            paramValues.outputDepth = '5'; // Default value
+        }
+    }
+
+    // Use the enhanced method with the collected parameters
+    callApiWithParams(url, resultId, paramValues);
 }
 
 // Notifications
@@ -114,4 +237,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, {once: true});
         });
     });
+
+    // Initialize exercise parameters
+    updateExerciseParams();
 });

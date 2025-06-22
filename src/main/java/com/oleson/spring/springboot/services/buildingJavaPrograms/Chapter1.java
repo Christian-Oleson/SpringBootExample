@@ -2,6 +2,11 @@ package com.oleson.spring.springboot.services.buildingJavaPrograms;
 
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 @Service
 public class Chapter1 {
 
@@ -42,5 +47,21 @@ public class Chapter1 {
         }
 
         return sb.toString();
+    }
+
+    public static String readKotlinFile(String fileName) throws Exception {
+        var filePath = findFileRecursively("C:\\proj-old", fileName);
+        return Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
+    }
+
+    public static String findFileRecursively(String rootDir, String fileName) throws Exception {
+        try (var paths = Files.walk(Paths.get(rootDir))) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().equals(fileName))
+                    .map(Path::toString)
+                    .findFirst()
+                    .orElse(null);
+        }
     }
 }
