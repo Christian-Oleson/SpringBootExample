@@ -38,6 +38,10 @@ public class HelloJavaController {
 
     @GetMapping("/exercise3")
     public String exercise3(String fileName) throws Exception {
+        if (fileName == null || fileName.isBlank()) {
+            return "File name cannot be null or blank.";
+        }
+
         return Chapter1.readKotlinFile(fileName);
     }
 }

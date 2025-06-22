@@ -49,7 +49,7 @@ public class Chapter1 {
         return sb.toString();
     }
 
-    public static String readKotlinFile(String fileName) throws Exception {
+    public String readKotlinFile(String fileName) throws Exception {
         var filePath = findFileRecursively("C:\\proj-old", fileName);
         return Files.readString(Path.of(filePath), StandardCharsets.UTF_8);
     }

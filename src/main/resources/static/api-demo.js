@@ -162,7 +162,12 @@ function callApi(url, resultId) {
 
     // Check if this is a name parameter request
     if (nameInput && nameInput.value) {
-        paramValues.name = nameInput.value;
+        // Special case for fibonacci endpoint which needs a 'number' parameter
+        if (url.includes('/fibonacci')) {
+            paramValues.number = nameInput.value;
+        } else {
+            paramValues.name = nameInput.value;
+        }
     }
 
     // For exercise2, check for outputDepth input
